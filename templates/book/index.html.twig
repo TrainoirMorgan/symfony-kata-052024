@@ -5,6 +5,6 @@
 {% block body %}
 <h2>Books</h2>
 {% for book in books %}
-<h3>{{book}}</h3>
+<h3><a href="{{ path('book', { slug: book.slug }) }}">{{book}}</a></h3>
 {% endfor %}
 {% endblock %}

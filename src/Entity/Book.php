@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\BookRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BookRepository;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[UniqueEntity('slug')]
 class Book implements \Stringable
 {
     #[ORM\Id]
@@ -35,6 +38,9 @@ class Book implements \Stringable
     #[ORM\ManyToOne(inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $addedBy = null;
+
+    #[ORM\Column(length: 255, unique:true)]
+    private ?string $slug = null;
 
     public function __toString(): string
     {
@@ -129,4 +135,22 @@ class Book implements \Stringable
 
         return $this;
     }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+    public function computeSlug(SluggerInterface $slugger)
+   {
+       if (!$this->slug || '-' === $this->slug) {
+           $this->slug = (string) $slugger->slug((string) $this)->lower();
+       }
+   }
 }
