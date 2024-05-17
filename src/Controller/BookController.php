@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Book;
 use App\Repository\BookRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,4 +17,15 @@ class BookController extends AbstractController
             'books' => $bookRepository->findAll(),
         ]);
     }
+
+
+    #[Route('/book/{slug}', name: 'book')]
+    public function show(
+        Book $book
+    ) :Response {
+        return $this->render('book/show.html.twig', [
+            'book' => $book
+        ]); 
+    }
+
 }
