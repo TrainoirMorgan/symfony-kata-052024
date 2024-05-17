@@ -19,7 +19,7 @@ class BookController extends AbstractController
     }
 
 
-    #[Route('/book/{slug}', name: 'book')]
+##[Route('/book/{slug}', name: 'book')]
     public function show(
         Book $book
     ) :Response {
