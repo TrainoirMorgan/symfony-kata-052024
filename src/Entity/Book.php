@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
-class Book
+class Book implements \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -35,6 +35,11 @@ class Book
     #[ORM\ManyToOne(inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $addedBy = null;
+
+    public function __toString(): string
+    {
+        return $this->title.', '.$this->author.' - '.$this->getAddedBy()->getId();
+    }
 
     public function getId(): ?int
     {
