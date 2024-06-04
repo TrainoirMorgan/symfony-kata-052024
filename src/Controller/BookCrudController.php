@@ -73,7 +73,7 @@ class BookCrudController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_book_crud_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('homepage', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('book_crud/edit.html.twig', [
@@ -91,6 +91,6 @@ class BookCrudController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_book_crud_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('homepage', [], Response::HTTP_SEE_OTHER);
     }
 }
