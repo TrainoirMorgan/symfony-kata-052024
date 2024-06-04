@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class BookCrudController extends AbstractController
 {
@@ -21,6 +21,8 @@ class BookCrudController extends AbstractController
             'books' => $bookRepository->findAll(),
         ]);
     }
+
+    #[IsGranted('ROLE_USER')]
 
     #[Route('/book/new', name: 'app_book_crud_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -50,6 +52,8 @@ class BookCrudController extends AbstractController
         ]);
     }
 
+   
+    #[IsGranted('ROLE_USER')]
     #[Route('/book/{slug}/edit', name: 'app_book_crud_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Book $book, EntityManagerInterface $entityManager): Response
     {
@@ -68,6 +72,7 @@ class BookCrudController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/book/{slug}', name: 'app_book_crud_delete', methods: ['POST'])]
     public function delete(Request $request, Book $book, EntityManagerInterface $entityManager): Response
     {
