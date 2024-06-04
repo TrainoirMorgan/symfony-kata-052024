@@ -12,6 +12,13 @@
         {% endblock %}
     </head>
     <body>
+    <header>
+    {% if is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('admin')}}">Admin</a>
+    <hr>
+    {% endif %}
+    
+    </header>
         {% block body %}{% endblock %}
     </body>
 </html>
