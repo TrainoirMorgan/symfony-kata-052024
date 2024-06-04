@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Client\GoogleBookClient;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class BookCrudController extends AbstractController
@@ -25,13 +27,21 @@ class BookCrudController extends AbstractController
     #[IsGranted('ROLE_USER')]
 
     #[Route('/book/new', name: 'app_book_crud_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function new(Request $request, EntityManagerInterface $entityManager, GoogleBookClient $client, SluggerInterface $slugger): Response    {
         $book = new Book();
         $form = $this->createForm(BookType::class, $book);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $bookDto = $client->searchBook(title: $book->getTitle(), author: $book->getAuthor());
+
+            $book->setTitle($bookDto->title);
+            $book->setAuthor($bookDto->author);
+            $book->setPublishedDate($bookDto->publishedDate);
+            $book->setIsbn($bookDto->isbn );
+            $book->setAddedBy($this->getUser());
+            $book->setCreatedAt(new \DateTimeImmutable());
+            $book->setSlug($slugger->slug($bookDto->title));
             $entityManager->persist($book);
             $entityManager->flush();
 
@@ -63,7 +73,7 @@ class BookCrudController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_book_crud_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('homepage', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('book_crud/edit.html.twig', [
@@ -73,7 +83,7 @@ class BookCrudController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/book/{slug}', name: 'app_book_crud_delete', methods: ['POST'])]
+    #[Route('/{slug}', name: 'app_book_delete', methods: ['DELETE'])]
     public function delete(Request $request, Book $book, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->getPayload()->get('_token'))) {
@@ -81,6 +91,6 @@ class BookCrudController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_book_crud_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('homepage', [], Response::HTTP_SEE_OTHER);
     }
 }
